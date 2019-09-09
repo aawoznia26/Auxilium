@@ -31,37 +31,36 @@ public class Transaction {
     @JoinColumn(name = "PROVIDER_ID")
     private User serviceProvider;
 
-    @ManyToOne()
-    @JoinColumn(name = "SERVICES_ID")
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
     private Services service;
 
     @Enumerated(EnumType.STRING)
-    private TransactionStatus transactionStatus;
+    private ServicesTransactionStatus servicesTransactionStatus;
 
     public Transaction(User owner, Services service) {
         this.owner = owner;
         this.service = service;
     }
 
-    public Transaction(User owner, Services service, TransactionStatus transactionStatus) {
+    public Transaction(User owner, Services service, ServicesTransactionStatus servicesTransactionStatus) {
         this.owner = owner;
         this.service = service;
-        this.transactionStatus = transactionStatus;
+        this.servicesTransactionStatus = servicesTransactionStatus;
     }
 
     public static TransactionDto mapToTransationDto(final Transaction transaction){
         if(transaction.getServiceProvider() == null){
             TransactionDto transactionDto = new TransactionDto(transaction.getId(), User.mapToUserDto(transaction.getOwner())
-                    , Services.mapToServicesDto(transaction.getService()), transaction.getTransactionStatus());
+                    , Services.mapToServicesDto(transaction.getService()), transaction.getServicesTransactionStatus());
             return transactionDto;
         } else {
             TransactionDto transactionDto = new TransactionDto(transaction.getId(), User.mapToUserDto(transaction.getOwner()),User.mapToUserDto(transaction.getServiceProvider())
-                    , Services.mapToServicesDto(transaction.getService()), transaction.getTransactionStatus());
+                    , Services.mapToServicesDto(transaction.getService()), transaction.getServicesTransactionStatus());
             return transactionDto;
         }
     }
 
-    public static List<TransactionDto> mapToTransationDtoList(final List<Transaction> transactions){
+    public static List<TransactionDto> mapToTransactionDtoList(final List<Transaction> transactions){
         return transactions.stream()
                 .map(t -> mapToTransationDto(t))
                 .collect(Collectors.toList());

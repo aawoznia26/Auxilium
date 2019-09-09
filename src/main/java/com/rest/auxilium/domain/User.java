@@ -1,6 +1,7 @@
 package com.rest.auxilium.domain;
 
 import com.rest.auxilium.dto.UserDto;
+import com.rest.auxilium.observer.Observer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Observer {
 
     @Id
     @GeneratedValue
@@ -36,10 +37,11 @@ public class User {
     @Column(length = 25)
     private String password;
 
+    private boolean notifyAboutPoints;
 
     @OneToMany(targetEntity = Points.class,
             cascade = CascadeType.MERGE,
-            mappedBy = "user")
+            mappedBy = "user", fetch = FetchType.EAGER)
     private List<Points> points;
 
     @OneToMany(targetEntity = Transaction.class,
@@ -50,13 +52,25 @@ public class User {
             mappedBy = "serviceProvider")
     private Set<Transaction> providerTransaction;
 
+    @OneToMany(targetEntity = Product.class,
+            mappedBy = "user")
+    private List<Product> product;
+
+    @OneToMany(targetEntity = Event.class,
+            mappedBy = "user")
+    private List<Event> event;
+
+    private boolean rewardedForPoints;
+
+    private boolean rewardedForTransactions;
+
+
     public User(String name, long phone, String email, String password) {
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.password = password;
     }
-
 
     public static UserDto mapToUserDto(final User user){
         UserDto userDto = new UserDto(
@@ -65,7 +79,13 @@ public class User {
                 user.getName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.getPassword());
+                user.getPassword(),
+                user.isNotifyAboutPoints());
         return userDto;
     }
+
+    public Email update(Points points){
+        return new Email(email, "Zmiana licznika punktów na Auxilium", "Własnie "
+                + points.getValue() + " Twoich punktów zmieniło status na " + points.getPointStatus().label, name);
+    };
 }

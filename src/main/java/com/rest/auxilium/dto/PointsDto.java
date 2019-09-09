@@ -27,7 +27,6 @@ public class PointsDto {
         this.userId = userId;
     }
 
-
     public PointsDto(Long id, int value, LocalDate expirationDate, PointStatus pointStatus) {
         this.id = id;
         this.value = value;

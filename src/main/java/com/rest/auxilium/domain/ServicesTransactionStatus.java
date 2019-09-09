@@ -1,6 +1,6 @@
 package com.rest.auxilium.domain;
 
-public enum TransactionStatus {
+public enum ServicesTransactionStatus {
     PUBLISHED,
     ASSIGNED,
     ACCEPTED

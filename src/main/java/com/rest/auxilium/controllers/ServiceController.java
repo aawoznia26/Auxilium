@@ -32,5 +32,10 @@ public class ServiceController {
     @RequestMapping(method = RequestMethod.GET, value = "/services/filter/{cityName}/{type}")
     public List<ServicesDto> getServicesByTypeAndCity(@PathVariable String cityName, @PathVariable String type) { return Services.mapToServicesDtoList(servicesService.getServicesByCityAndName(cityName, type)); }
 
+    @RequestMapping(method = RequestMethod.DELETE, value = "/services/{serviceId}")
+    public void deleteService(@PathVariable Long serviceId) {
+        servicesService.deleteService(serviceId);
+    }
+
 
 }

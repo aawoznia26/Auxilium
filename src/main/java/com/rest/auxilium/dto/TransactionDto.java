@@ -2,7 +2,7 @@ package com.rest.auxilium.dto;
 
 
 import com.rest.auxilium.domain.Transaction;
-import com.rest.auxilium.domain.TransactionStatus;
+import com.rest.auxilium.domain.ServicesTransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,18 +23,18 @@ public class TransactionDto {
 
     private ServicesDto servicesDto;
 
-    private TransactionStatus transactionStatus;
+    private ServicesTransactionStatus servicesTransactionStatus;
 
     public TransactionDto(UserDto ownerDto, ServicesDto servicesDto) {
         this.ownerDto = ownerDto;
         this.servicesDto = servicesDto;
     }
 
-    public TransactionDto(Long id, UserDto ownerDto, ServicesDto servicesDto, TransactionStatus transactionStatus) {
+    public TransactionDto(Long id, UserDto ownerDto, ServicesDto servicesDto, ServicesTransactionStatus servicesTransactionStatus) {
         this.id = id;
         this.ownerDto = ownerDto;
         this.servicesDto = servicesDto;
-        this.transactionStatus = transactionStatus;
+        this.servicesTransactionStatus = servicesTransactionStatus;
     }
 
     public static Transaction mapToTransation(final TransactionDto transactionDto){
@@ -44,7 +44,7 @@ public class TransactionDto {
         } else {
             Transaction transaction = new Transaction(transactionDto.getId(), UserDto.mapToUser(transactionDto.getOwnerDto())
                     , UserDto.mapToUser(transactionDto.getServiceProviderDto()), ServicesDto.mapToServices(transactionDto.getServicesDto())
-                    , transactionDto.getTransactionStatus());
+                    , transactionDto.getServicesTransactionStatus());
             return transaction;
         }
     }

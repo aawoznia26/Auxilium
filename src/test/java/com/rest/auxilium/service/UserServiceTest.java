@@ -8,9 +8,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 public class UserServiceTest {
 
     @Autowired
@@ -107,7 +109,7 @@ public class UserServiceTest {
         User user1 = new User("Zenek", 826351733, "anakaisdu@o2.pl", "Lk76m+09l");
         user1.setUuid(user.getUuid());
         //When
-        userService.changeEmail(user1);
+        userService.changeData(user1);
 
         //Then
         Assert.assertEquals("anakaisdu@o2.pl", userRepository.findFirstByUuid(uuid).getEmail());
@@ -123,7 +125,7 @@ public class UserServiceTest {
         User user1 = new User("Agata", 826351733, "anakaisdu@o2.pl", "Lk76m+09l");
         user1.setUuid(user.getUuid());
         //When
-        userService.changeName(user1);
+        userService.changeData(user1);
 
         //Then
         Assert.assertEquals("Agata", userRepository.findFirstByUuid(uuid).getName());
@@ -139,7 +141,7 @@ public class UserServiceTest {
         User user1 = new User("Agata", 111111111, "hagsgdv@o2.pl", "Lk76m+09l");
         user1.setUuid(user.getUuid());
         //When
-        userService.changePhone(user1);
+        userService.changeData(user1);
 
         //Then
         Assert.assertEquals(111111111, userRepository.findFirstByUuid(uuid).getPhone());
@@ -155,7 +157,7 @@ public class UserServiceTest {
         User user1 = new User("Agata", 826351733, "hagsgdv@o2.pl", "AbAd567*");
         user1.setUuid(user.getUuid());
         //When
-        userService.changePassword(user1);
+        userService.changeData(user1);
 
         //Then
         Assert.assertEquals("AbAd567*", userRepository.findFirstByUuid(uuid).getPassword());
@@ -176,6 +178,69 @@ public class UserServiceTest {
         Assert.assertEquals(foundUser.getPhone(), 82749824);
 
     }
+
+    @Test
+    public void foundUserByUUIDTest() {
+        //Given
+        User user = new User("Halina", 82543824, "jhhjgfhh@o2.pl", "Kbgcyf978654)");
+        String uuid = userService.saveUser(user).getUuid();
+        //When
+        User foundUser = userService.findUserByUUID(uuid);
+
+        //Then
+        Assert.assertNotEquals(foundUser, null);
+        Assert.assertEquals(foundUser.getEmail(), "jhhjgfhh@o2.pl");
+        Assert.assertEquals(foundUser.getPhone(), 82543824);
+
+    }
+
+    @Test
+    public void notifyAboutPointsChangeTest() {
+        //Given
+        User user = new User("Ala", 726383333, "dcvfvrf@o2.pl", "Lk75#$9278nsd");
+        User savedUser = userService.saveUser(user);
+        savedUser.setNotifyAboutPoints(true);
+
+        //When
+        userService.changeData(savedUser);
+
+        //Then
+        Assert.assertEquals(true, userRepository.findFirstByUuid(savedUser.getUuid()).isNotifyAboutPoints());
+
+    }
+
+    @Test
+    public void shouldMarkAsRewardedForPointsTest() {
+        //Given
+        User user = new User("Ala", 726383333, "dcvfvrf@o2.pl", "Lk75#$9278nsd");
+        User savedUser = userService.saveUser(user);
+        savedUser.setNotifyAboutPoints(true);
+
+        //When
+        userService.markAsRewardedForPoints(savedUser.getUuid());
+
+        //Then
+        Assert.assertEquals(true, userRepository.findFirstByUuid(savedUser.getUuid()).isRewardedForPoints());
+
+    }
+
+    @Test
+    public void shouldMarkAsRewardedForTransactionsTest() {
+        //Given
+        User user = new User("Ala", 726383333, "dcvfvrf@o2.pl", "Lk75#$9278nsd");
+        User savedUser = userService.saveUser(user);
+        savedUser.setNotifyAboutPoints(true);
+
+        //When
+        userService.markAsRewardedForTransactions(savedUser.getUuid());
+
+        //Then
+        Assert.assertEquals(true, userRepository.findFirstByUuid(savedUser.getUuid()).isRewardedForTransactions());
+
+    }
+
+
+
 
 
 }

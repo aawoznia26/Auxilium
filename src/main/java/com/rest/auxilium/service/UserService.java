@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-;
 
 @RequiredArgsConstructor
 @Service
@@ -36,7 +36,11 @@ public class UserService {
         if (isEmailValid(user.getEmail()) && isPasswordCorrect(user.getPassword())) {
             String uuid = UUID.randomUUID().toString();
             user.setUuid(uuid);
+            user.setNotifyAboutPoints(false);
             savedUser = userRepository.save(user);
+            LOGGER.info("User created successfully");
+        } else {
+            LOGGER.info("System rejected to create user");
         }
         return savedUser;
     }
@@ -55,7 +59,7 @@ public class UserService {
     private boolean isPasswordCorrect(String password) {
         pattern = Pattern.compile(PASSWORD_PATTERN);
         matcher = pattern.matcher(password);
-        if(matcher.matches()){
+        if (matcher.matches()) {
             LOGGER.info("Password correct");
         } else {
             LOGGER.error("Weak password. Your password must contain 8-25 characters, at least 1 lower case letter, upper case letter, digit and special character");
@@ -79,35 +83,44 @@ public class UserService {
         return ifLoginSuccessful;
     }
 
-    public User changeEmail(User user){
+    public User changeData(User user) {
         User userToUpdate = userRepository.findFirstByUuid(user.getUuid());
-        userToUpdate.setEmail(user.getEmail());
-        return userRepository.save(userToUpdate);
-    }
-
-    public User changeName(User user){
-        User userToUpdate = userRepository.findFirstByUuid(user.getUuid());
-        userToUpdate.setName(user.getName());
-        return userRepository.save(userToUpdate);
-    }
-
-    public User changePassword(User user){
-        User userToUpdate = userRepository.findFirstByUuid(user.getUuid());
-        if(isPasswordCorrect(user.getPassword())){
-            userToUpdate.setPassword(user.getPassword());
+        if(userToUpdate != null){
+            userToUpdate.setEmail(user.getEmail());
+            userToUpdate.setName(user.getName());
+            if (isPasswordCorrect(user.getPassword())) {
+                userToUpdate.setPassword(user.getPassword());
+            }
+            userToUpdate.setPhone(user.getPhone());
+            userToUpdate.setNotifyAboutPoints(user.isNotifyAboutPoints());
+            LOGGER.info("User found. Data change successful");
+        } else {
+            LOGGER.error("User not found. Data change impossible");
         }
         return userRepository.save(userToUpdate);
     }
 
-    public User changePhone(User user){
-        User userToUpdate = userRepository.findFirstByUuid(user.getUuid());
-        userToUpdate.setPhone(user.getPhone());
-        return userRepository.save(userToUpdate);
+    public User findUserByLoginData(String email, String password) {
+        return Optional.ofNullable(userRepository.findFirstByEmailAndPassword(email, password)).orElse(new User());
     }
 
-    public User findUserByLoginData(String email, String password){
-        User foundUser = userRepository.findFirstByEmailAndPassword(email, password);
-        return foundUser;
+    public User findUserByUUID(String uuid) {
+        return Optional.ofNullable(userRepository.findFirstByUuid(uuid)).orElse(new User());
+    }
+
+    public void markAsRewardedForPoints(String uuid) {
+        Optional.ofNullable(userRepository.findFirstByUuid(uuid)).map(user -> {
+            user.setRewardedForPoints(true);
+            return userRepository.save(user);
+        }).orElse(new User());
+
+    }
+
+    public void markAsRewardedForTransactions(String uuid) {
+        Optional.ofNullable(userRepository.findFirstByUuid(uuid)).map(user -> {
+            user.setRewardedForTransactions(true);
+            return userRepository.save(user);
+        }).orElse(new User());
     }
 
 }

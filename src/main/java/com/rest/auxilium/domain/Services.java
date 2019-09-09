@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,25 +25,35 @@ public class Services {
     @Column(length = 100)
     private String name;
 
-    @Column(length = 255)
     private String description;
 
     @Column(length = 50)
     private String city;
 
+    @Enumerated(EnumType.STRING)
+    private ServicesTransactionStatus servicesTransactionStatus;
+
     private int points;
 
-    @OneToMany(targetEntity = Transaction.class,
-            mappedBy = "service")
-    private List<Transaction> transaction = new ArrayList<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "TRANSACTION_ID")
+    private Transaction transaction;
 
-    public Services(String name, String description, int points, String city) {
+    public Services(String name, String description, String city) {
         this.name = name;
         this.description = description;
-        this.points = points;
         this.city = city;
-
     }
+
+    public Services(String name, String description, String city, int points, ServicesTransactionStatus servicesTransactionStatus) {
+        this.name = name;
+        this.description = description;
+        this.city = city;
+        this.points = points;
+        this.servicesTransactionStatus = servicesTransactionStatus;
+    }
+
+
 
     public static ServicesDto mapToServicesDto(final Services services){
         ServicesDto servicesDto = new ServicesDto(
@@ -52,7 +61,8 @@ public class Services {
                 services.getName(),
                 services.getDescription(),
                 services.getPoints(),
-                services.getCity());
+                services.getCity(),
+                services.getServicesTransactionStatus());
         return servicesDto;
     }
 
@@ -63,7 +73,8 @@ public class Services {
                         s.getName(),
                         s.getDescription(),
                         s.getPoints(),
-                        s.getCity()))
+                        s.getCity(),
+                        s.getServicesTransactionStatus()))
                .collect(Collectors.toList());
     }
 

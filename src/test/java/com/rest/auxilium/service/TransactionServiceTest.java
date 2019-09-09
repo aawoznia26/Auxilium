@@ -3,8 +3,9 @@ package com.rest.auxilium.service;
 
 import com.rest.auxilium.domain.Services;
 import com.rest.auxilium.domain.Transaction;
-import com.rest.auxilium.domain.TransactionStatus;
+import com.rest.auxilium.domain.ServicesTransactionStatus;
 import com.rest.auxilium.domain.User;
+import com.rest.auxilium.repository.ServicesRepository;
 import com.rest.auxilium.repository.TransactionRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,16 +34,19 @@ public class TransactionServiceTest {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private ServicesRepository servicesRepository;
+
+
     @Test
     public void createTransactionTest() {
         //Given
         User user = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
         userService.saveUser(user);
 
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Warszawa");
-        servicesService.addService(service);
+        Services savedService = servicesService.addService(new Services("Przygotowanie posiłku", "Go for shopping content","Warszawa"));
 
-        Transaction transaction = new Transaction(user, service);
+        Transaction transaction = new Transaction(user, savedService);
         long transactionCountBeforeSave = transactionRepository.count();
 
         //When
@@ -59,17 +63,20 @@ public class TransactionServiceTest {
         User owner = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
         userService.saveUser(owner);
 
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Rzeszów");
-        servicesService.addService(service);
+        Services savedService =servicesService.addService(new Services("Asysta w wizycie w kościele", "Go for shopping content"
+                ,"Rzeszów"));
 
-        Transaction transaction = new Transaction(owner, service);
-        Long id = transactionService.createTransaction(transaction).getId();
+        Transaction transaction = new Transaction(owner, savedService);
+        Transaction savedTransaction= transactionService.createTransaction(transaction);
+        savedService.setTransaction(savedTransaction);
+        servicesRepository.save(savedService);
+        Long id = savedTransaction.getId();
 
         User serviceProvider = new User("Patryk", 273628933, "skqjqhhehe@gmailo.com", "GhsN827%2d");
         userService.saveUser(serviceProvider);
 
         //When
-        transactionService.assignTransaction(id, serviceProvider);
+        transactionService.assignTransaction(savedService.getId(), serviceProvider);
 
         //Then
         Assert.assertEquals("Patryk", transactionRepository.getOne(id).getServiceProvider().getName());
@@ -83,41 +90,27 @@ public class TransactionServiceTest {
         //Given
         User owner = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
         userService.saveUser(owner);
+        User provider = new User("Bartosz", 872123292, "nshbdjhe@gmailo.com", "KhhdOe86$2");
+        userService.saveUser(provider);
 
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Piastów");
-        servicesService.addService(service);
 
-        Transaction transaction = new Transaction(owner, service);
+        Services savedService = servicesService.addService(new Services("Sprzątanie mieszkania", "Go for shopping content"
+                ,"Piastów"));
+        Long serviceId = savedService.getId();
+
+        Transaction transaction = new Transaction(owner, savedService);
         Transaction savedTransaction = transactionService.createTransaction(transaction);
+        savedService.setTransaction(savedTransaction);
+        servicesRepository.save(savedService);
+        transactionService.assignTransaction(serviceId, provider);
 
         //When
-        transactionService.acceptTransaction(savedTransaction);
+        transactionService.acceptTransaction(serviceId);
 
         //Then
-        Assert.assertEquals(TransactionStatus.ACCEPTED, transactionRepository.getOne(savedTransaction.getId()).getTransactionStatus());
+        Assert.assertEquals(ServicesTransactionStatus.ACCEPTED, transactionRepository.getOne(savedTransaction.getId()).getServicesTransactionStatus());
     }
 
-    @Test
-    public void deleteTransactionTest() {
-        //Given
-        User user = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
-        userService.saveUser(user);
-
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Gdańsk");
-        servicesService.addService(service);
-
-        Transaction transaction = new Transaction(user, service);
-        Transaction savedTransaction = transactionService.createTransaction(transaction);
-        long transactionCountAfterSave = transactionRepository.count();
-
-        //When
-        transactionService.deleteTransaction(savedTransaction.getId());
-        long transactionCountAfterDelete = transactionRepository.count();
-
-        //Then
-        Assert.assertEquals(++transactionCountAfterDelete, transactionCountAfterSave);
-
-    }
 
     @Test
     public void getAllPublishedTransactionsTest() {
@@ -125,10 +118,10 @@ public class TransactionServiceTest {
         User user = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
         userService.saveUser(user);
 
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Koszalin");
-        servicesService.addService(service);
+        Services savedService = servicesService.addService(new Services("Przygotowanie posiłku"
+                , "Go for shopping content","Koszalin"));
 
-        Transaction transaction = new Transaction(user, service);
+        Transaction transaction = new Transaction(user, savedService);
         Transaction savedTransaction = transactionService.createTransaction(transaction);
 
         //When
@@ -145,10 +138,10 @@ public class TransactionServiceTest {
         User user = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
         userService.saveUser(user);
 
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Koszalin");
-        servicesService.addService(service);
+        Services savedService = servicesService.addService(new Services("Asysta podczas wizyty u lekarza"
+                , "Go for shopping content","Koszalin"));
 
-        Transaction transaction = new Transaction(user, service);
+        Transaction transaction = new Transaction(user, savedService);
         Transaction savedTransaction = transactionService.createTransaction(transaction);
 
         //When
@@ -165,15 +158,18 @@ public class TransactionServiceTest {
         User owner = new User("Kamil", 872738292, "mammanjud@gmailo.com", "Hkanj86$2");
         userService.saveUser(owner);
 
-        Services service = new Services("go for shopping", "Go for shopping content", 90, "Warszawa");
-        servicesService.addService(service);
+        Services savedService = servicesService.addService(new Services("Przygotowanie posiłku"
+                , "Go for shopping content", "Warszawa"));
 
-        Transaction transaction = new Transaction(owner, service);
-        Long id = transactionService.createTransaction(transaction).getId();
+        Transaction transaction = new Transaction(owner, savedService);
+        Transaction savedTransaction= transactionService.createTransaction(transaction);
+        savedService.setTransaction(savedTransaction);
+        servicesRepository.save(savedService);
+        Long id = savedTransaction.getId();
 
         User serviceProvider = new User("Patryk", 273628933, "skqjqhhehe@gmailo.com", "GhsN827%2d");
         userService.saveUser(serviceProvider);
-        transactionService.assignTransaction(id, serviceProvider);
+        transactionService.assignTransaction(savedService.getId(), serviceProvider);
 
         //When
         List<Transaction> transactionList = transactionService.getAllTransactionsServicedByUser(serviceProvider.getUuid());
@@ -182,4 +178,5 @@ public class TransactionServiceTest {
         Assert.assertEquals(1, transactionList.size());
 
     }
+
 }

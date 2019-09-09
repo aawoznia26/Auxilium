@@ -1,5 +1,6 @@
 package com.rest.auxilium.domain;
 
+import com.rest.auxilium.observer.Observable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Points {
+public class Points implements Observable {
 
     @Id
     @GeneratedValue
@@ -25,7 +26,7 @@ public class Points {
     @Enumerated(EnumType.STRING)
     private PointStatus pointStatus;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID")
     private User user;
 
@@ -40,5 +41,9 @@ public class Points {
         this.pointStatus = pointStatus;
         this.user = user;
     }
+
+    public void notifyObserver(){
+        user.update(this);
+    };
 
 }

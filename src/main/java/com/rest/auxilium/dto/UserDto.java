@@ -16,6 +16,7 @@ public class UserDto {
     private long phone;
     private String email;
     private String password;
+    private boolean notifyAboutPoints;
 
     public UserDto(String name, long phone, String email, String password) {
         this.name = name;
@@ -36,6 +37,10 @@ public class UserDto {
         if(userDto.getId() != null){
             user.setId(userDto.getId());
         }
+        if(userDto.isNotifyAboutPoints() != false){
+            user.setNotifyAboutPoints(userDto.isNotifyAboutPoints());
+        }
+
         return user;
     }
 
