@@ -26,17 +26,21 @@ public class TicketMasterClient {
     private TicketMasterConfig ticketMasterConfig;
 
     private URI urlBuild(){
+        LOGGER.info("Building url started");
         URI url = UriComponentsBuilder.fromHttpUrl(ticketMasterConfig.getEventEndpoint() + "?" + ticketMasterConfig.getCountryCode()
                 + "&" + ticketMasterConfig.getApiKey()).build().encode().toUri();
+        LOGGER.info("Building url started. URI build: " + url);
         return url;
 
     }
 
     public TicketMasterDto getTicketMasterEvents(){
+        LOGGER.info("Getting TicketMaster events started");
         URI url = urlBuild();
 
         try{
             TicketMasterDto response = Optional.ofNullable(restTemplate.getForObject(url, TicketMasterDto.class)).orElse(new TicketMasterDto());
+            LOGGER.info("Getting TicketMaster events finished successfully");
             return response;
 
         } catch (RuntimeException e){

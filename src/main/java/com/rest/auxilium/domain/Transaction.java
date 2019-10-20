@@ -67,5 +67,14 @@ public class Transaction {
 
     }
 
-
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", owner=" + owner +
+                ", serviceProvider=" + serviceProvider +
+                ", service=" + service +
+                ", servicesTransactionStatus=" + servicesTransactionStatus +
+                '}';
+    }
 }

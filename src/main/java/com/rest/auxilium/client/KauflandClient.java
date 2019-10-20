@@ -33,12 +33,15 @@ public class KauflandClient {
 
 
     private URI urlBuild(){
+        LOGGER.info("Building url started");
         URI url = UriComponentsBuilder.fromHttpUrl(kauflandConfig.getOfferEndpoint() + kauflandConfig.getStoreId()).build().encode().toUri();
+        LOGGER.info("Building url started. URI build: " + url);
         return url;
 
     }
 
     public List<KauflandDto> getKauflandProducts(){
+        LOGGER.info("Getting Kaufland products started");
 
         try{
             HttpHeaders headers = new HttpHeaders();
@@ -48,8 +51,8 @@ public class KauflandClient {
             URI url = urlBuild();
 
             ResponseEntity<KauflandDto[]> respEntity = restTemplate.exchange(url, HttpMethod.GET, entity, KauflandDto[].class);
+            LOGGER.info("Getting Kaufland products finished successfully. List size: " + Arrays.stream(respEntity.getBody()).collect(Collectors.toList()).size());
             return Optional.ofNullable(Arrays.stream(respEntity.getBody()).collect(Collectors.toList())).orElse(new ArrayList<>());
-
 
         } catch (RuntimeException e){
             LOGGER.error(e.getMessage());

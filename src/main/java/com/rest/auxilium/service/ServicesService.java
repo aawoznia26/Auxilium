@@ -35,6 +35,7 @@ public class ServicesService {
     }
 
     public Services addService(Services services){
+        LOGGER.info("Service creation started");
         String name = services.getName();
         Services serviceSaved = new Services();
         if(pointsMap.get(name) != null) {
@@ -51,19 +52,27 @@ public class ServicesService {
     }
 
     public List<Services> getServicesList(){
-        return servicesRepository.findAllByServicesTransactionStatus(ServicesTransactionStatus.PUBLISHED);
+        List<Services> servicesList = servicesRepository.findAllByServicesTransactionStatus(ServicesTransactionStatus.PUBLISHED);
+        LOGGER.info("Getting all published services list. List size " + servicesList.size());
+        return servicesList;
     }
 
     public List<Services> getServicesByCity(String city){
-        return servicesRepository.findAllByCityAndServicesTransactionStatus(city, ServicesTransactionStatus.PUBLISHED);
+        List<Services> servicesList = servicesRepository.findAllByCityAndServicesTransactionStatus(city, ServicesTransactionStatus.PUBLISHED);
+        LOGGER.info("Getting all published services list by city. List size" + servicesList.size());
+        return servicesList;
     }
 
     public List<Services> getServicesByName(String name){
-        return servicesRepository.findAllByNameAndServicesTransactionStatus(name, ServicesTransactionStatus.PUBLISHED);
+        List<Services> servicesList = servicesRepository.findAllByNameAndServicesTransactionStatus(name, ServicesTransactionStatus.PUBLISHED);
+        LOGGER.info("Getting all published services list by name. List size" + servicesList.size());
+        return servicesList;
     }
 
     public List<Services> getServicesByCityAndName(String city, String name){
-        return servicesRepository.findAllByCityAndNameAndServicesTransactionStatus(city, name, ServicesTransactionStatus.PUBLISHED);
+        List<Services> servicesList = servicesRepository.findAllByCityAndNameAndServicesTransactionStatus(city, name, ServicesTransactionStatus.PUBLISHED);
+        LOGGER.info("Getting all published services list by city and name. List size" + servicesList.size());
+        return servicesList;
     }
 
     public void deleteService(Long serviceId){

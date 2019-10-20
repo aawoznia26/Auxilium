@@ -94,10 +94,10 @@ public class UserControllerTestSuite {
         when(userService.loginUser(email, password)).thenReturn(true);
 
         //When & Then
-        mockMvc.perform(get("/v1//user/login").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(get("/v1/user/login").contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
-                .param("email", email)
-                .param("password", password))
+                .header("email", email)
+                .header("password", password))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$", Matchers.is(true)));
     }
@@ -119,8 +119,8 @@ public class UserControllerTestSuite {
         //When & Then
         mockMvc.perform(get("/v1/user").contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
-                .param("email", email)
-                .param("password", password))
+                .header("email", email)
+                .header("password", password))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.name", Matchers.is("Kamil")));
     }

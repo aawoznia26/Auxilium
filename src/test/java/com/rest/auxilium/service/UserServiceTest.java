@@ -65,7 +65,10 @@ public class UserServiceTest {
 
     @Test
     public void shouldNotLoginUserEmail() {
+
         //Given
+        User user = new User("Zygfryd", 872738292, "nnahaha@kj.pl", "Kdbdbdbuu0^");
+        userService.saveUser(user);
 
         //When
         boolean result = userService.loginUser("nnahaha@k2.pl", "Kdbdbdbuu0^");
@@ -77,7 +80,7 @@ public class UserServiceTest {
     @Test
     public void shouldNotLoginUserPassword() {
         //Given
-        User user = new User("Ewa", 72635362, "gafsss@jk.com", ")(736Kn");
+        User user = new User("Ewa", 72635362, "gafsss@jk.com", ")(736Knvrgr5r");
         userService.saveUser(user);
         //When
         boolean result = userService.loginUser("gafsss.com", ")(736Kn");

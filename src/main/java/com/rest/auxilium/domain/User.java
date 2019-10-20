@@ -86,6 +86,21 @@ public class User implements Observer {
 
     public Email update(Points points){
         return new Email(email, "Zmiana licznika punktów na Auxilium", "Własnie "
-                + points.getValue() + " Twoich punktów zmieniło status na " + points.getPointStatus().label, name);
+                + points.getValue() + " Twoich punktów zmieniło status na " + points.getPointStatus().label, name, EmailGroup.VIP);
     };
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", name='" + name + '\'' +
+                ", phone=" + phone +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", notifyAboutPoints=" + notifyAboutPoints +
+                ", rewardedForPoints=" + rewardedForPoints +
+                ", rewardedForTransactions=" + rewardedForTransactions +
+                '}';
+    }
 }

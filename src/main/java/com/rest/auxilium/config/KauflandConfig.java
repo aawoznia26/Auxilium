@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class KauflandConfig {
-    @Value("https://api.kaufland.net/offers/api/v5/")
+    @Value("${kaufland.offer.endpoint}")
     private String offerEndpoint;
 
-    @Value("7234843e4be34f2980b40fe92d6e6554")
+    @Value("${kaufland.subscription.key}")
     private String subscriptionKey;
 
-    @Value("PL7360")
+    @Value("${kaufland.store.id}")
     private String storeId;
 }

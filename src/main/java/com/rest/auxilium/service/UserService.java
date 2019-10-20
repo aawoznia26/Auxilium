@@ -33,6 +33,7 @@ public class UserService {
     @Transactional
     public User saveUser(User user) {
         User savedUser = null;
+        LOGGER.info("Preparation to create user " + user.toString());
         if (isEmailValid(user.getEmail()) && isPasswordCorrect(user.getPassword())) {
             String uuid = UUID.randomUUID().toString();
             user.setUuid(uuid);
@@ -47,6 +48,7 @@ public class UserService {
 
     private boolean isEmailValid(String email) {
         boolean isEmailValid = false;
+        LOGGER.info("Validation of email " + email);
         if (EmailValidator.getInstance().isValid(email)) {
             isEmailValid = true;
             LOGGER.info("Email is valid");
@@ -59,23 +61,26 @@ public class UserService {
     private boolean isPasswordCorrect(String password) {
         pattern = Pattern.compile(PASSWORD_PATTERN);
         matcher = pattern.matcher(password);
+        LOGGER.info("Validation of password: " + password);
         if (matcher.matches()) {
             LOGGER.info("Password correct");
         } else {
-            LOGGER.error("Weak password. Your password must contain 8-25 characters, at least 1 lower case letter, upper case letter, digit and special character");
+            LOGGER.error("Weak password. Password must contain 8-25 characters, at least 1 lower case letter, upper case letter, digit and special character");
         }
         return matcher.matches();
 
     }
 
     public boolean loginUser(String email, String password) {
+        LOGGER.info("Login email: " + email + " login password: " + password);
         boolean ifLoginSuccessful = false;
-        if (userRepository.findFirstByEmail(email) != null) {
-            User foundUser = userRepository.findFirstByEmail(email);
-            LOGGER.info("User found");
+
+        if (findUserByLoginData(email, password).getUuid() != null) {
+            User foundUser = findUserByLoginData(email, password);
+            LOGGER.info("User found uuid:" + foundUser.getUuid());
             if (foundUser.getPassword().equals(password)) {
                 ifLoginSuccessful = true;
-                LOGGER.info("Password correct");
+                LOGGER.info("Password '" + password +"' correct");
             }
         } else {
             LOGGER.error("Login failed. User does not exist or password is incorrect");
@@ -84,7 +89,9 @@ public class UserService {
     }
 
     public User changeData(User user) {
-        User userToUpdate = userRepository.findFirstByUuid(user.getUuid());
+        LOGGER.info("Preparation to change user data to " + user.toString());
+        User userToUpdate = findUserByUUID(user.getUuid());
+        LOGGER.info("Found user " + userToUpdate.toString());
         if(userToUpdate != null){
             userToUpdate.setEmail(user.getEmail());
             userToUpdate.setName(user.getName());
@@ -93,7 +100,7 @@ public class UserService {
             }
             userToUpdate.setPhone(user.getPhone());
             userToUpdate.setNotifyAboutPoints(user.isNotifyAboutPoints());
-            LOGGER.info("User found. Data change successful");
+            LOGGER.info("Data change successful");
         } else {
             LOGGER.error("User not found. Data change impossible");
         }
@@ -109,7 +116,9 @@ public class UserService {
     }
 
     public void markAsRewardedForPoints(String uuid) {
-        Optional.ofNullable(userRepository.findFirstByUuid(uuid)).map(user -> {
+
+        Optional.ofNullable(findUserByUUID(uuid)).map(user -> {
+            LOGGER.info("Mark as rewarded for points, user " + user.toString());
             user.setRewardedForPoints(true);
             return userRepository.save(user);
         }).orElse(new User());
@@ -117,7 +126,8 @@ public class UserService {
     }
 
     public void markAsRewardedForTransactions(String uuid) {
-        Optional.ofNullable(userRepository.findFirstByUuid(uuid)).map(user -> {
+        Optional.ofNullable(findUserByUUID(uuid)).map(user -> {
+            LOGGER.info("Mark as rewarded for transaction, user " + user.toString());
             user.setRewardedForTransactions(true);
             return userRepository.save(user);
         }).orElse(new User());

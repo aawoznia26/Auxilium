@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TicketMasterConfig {
 
-    @Value("https://app.ticketmaster.com/discovery/v2/events.json")
+    @Value("${ticketmaster.event.endpoint}")
     private String eventEndpoint;
 
-    @Value("apikey=t5EIJfzmAdFHDYXYtvGp3AArvbJqATXS")
+    @Value("${ticketmaster.api.key}")
     private String apiKey;
 
-    @Value("countryCode=PL")
+    @Value("${ticketmaster.country.code}")
     private String countryCode;
 
 }

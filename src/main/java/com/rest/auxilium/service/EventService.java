@@ -13,6 +13,8 @@ import com.rest.auxilium.dto.ticketMaster.TicketMasterDatesDto;
 import com.rest.auxilium.dto.ticketMaster.TicketMasterDto;
 import com.rest.auxilium.repository.EventRepository;
 import com.rest.auxilium.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,23 +42,30 @@ public class EventService implements TicketMasterPriceCalculator {
     @Autowired
     private EventAdapter eventAdapter;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
+
     public List<Event> fetchEvents(){
+        LOGGER.info("Fetching events");
         TicketMasterDto ticketMasterDto = ticketMasterClient.getTicketMasterEvents();
         return eventAdapter.createEvents(ticketMasterDto);
     }
 
 
     public Event collectEvent(Event event, String uuid){
+        LOGGER.info("Collecting event started");
         User user = userRepository.findFirstByUuid(uuid);
         int eventPriceInPoints = event.getPriceInPoints();
         Event savedEvent = new Event();
         if(pointsService.getAllUserPoints(uuid) >= eventPriceInPoints){
+            LOGGER.info("User uuid: " + uuid + "has enough points to collect event id:"
+                    + event.getId() + "worth " + event.getPriceInPoints() + " points");
             Points points = new Points(-eventPriceInPoints, LocalDate.now(), PointStatus.USED, user);
             pointsService.savePoints(points);
             Event eventToSave = new Event(event.getId(), event.getName(), event.getUrl() ,event.getImage()
                     , event.getDate(), event.getSegment(), event.getSubsegment(), event.getPriceInPoints());
             eventToSave.setUser(user);
             savedEvent = eventRepository.save(eventToSave);
+            LOGGER.info("Collecting product finished");
         }
         return savedEvent;
 
@@ -64,6 +73,7 @@ public class EventService implements TicketMasterPriceCalculator {
 
     @Override
     public int calculatePrice(TicketMasterClassificationDto classificationDto, TicketMasterDatesDto ticketMasterDatesDto) {
+        LOGGER.info("Calculating event price");
         double price = 0;
 
         if (classificationDto.getSegment().getName().equals("Music")) {

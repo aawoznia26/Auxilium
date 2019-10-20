@@ -78,4 +78,14 @@ public class Services {
                .collect(Collectors.toList());
     }
 
+    @Override
+    public String toString() {
+        return "Services{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", city='" + city + '\'' +
+                ", points=" + points +
+                '}';
+    }
 }

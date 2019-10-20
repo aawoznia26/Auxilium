@@ -35,13 +35,18 @@ public class MailService {
 
     private MimeMessagePreparator createMimeMessage(final Email email){
         return mimeMessage -> {
+            LOGGER.info("Starting mimeMessage preparation");
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setTo(email.getReceiverEmail());
+            LOGGER.info("MimeMessage receiver set");
             messageHelper.setSubject(email.getSubject());
+            LOGGER.info("MimeMessage subject set");
             if(email.getSubject().equals("Zmiana licznika punktów na Auxilium")) {
                 messageHelper.setText(mailCreatorService.buildEmailWithPointsChange(email.getMessage(), email.getUserName()), true);
+                LOGGER.info("MimeMessage text set");
             } else {
                 messageHelper.setText(mailCreatorService.buildEmailWithVipPrize(email.getMessage(), email.getUserName(), email.getSubject()), true);
+                LOGGER.info("MimeMessage text set");
             }
 
         };

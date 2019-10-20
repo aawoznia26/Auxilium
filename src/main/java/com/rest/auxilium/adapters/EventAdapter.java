@@ -6,14 +6,14 @@ import com.rest.auxilium.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 public class EventAdapter {
 
     @Autowired
@@ -29,8 +29,8 @@ public class EventAdapter {
 
 
     public List<Event> createEvents(TicketMasterDto ticketMasterDto){
+        LOGGER.info("TicketMaster events adapter started to work");
         if(ticketMasterDto.getEmbedded() != null){
-
             return ticketMasterDto.getEmbedded().getEvents().stream()
                     .map(e -> {
                         setDate(LocalDate.parse(e.getDates().getStart().getLocalDate()));

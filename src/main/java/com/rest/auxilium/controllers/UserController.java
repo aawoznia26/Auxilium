@@ -5,6 +5,7 @@ import com.rest.auxilium.domain.User;
 import com.rest.auxilium.dto.UserDto;
 import com.rest.auxilium.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
@@ -22,11 +23,13 @@ public class UserController {
     public UserDto changeData(@RequestBody UserDto userDto) { return User.mapToUserDto(userService.changeData(UserDto.mapToUser(userDto))); }
 
     @RequestMapping(method = RequestMethod.GET, value = "/user/login")
-    public boolean login(@RequestParam String password, @RequestParam String email) { return (userService.loginUser(email, password)); }
+    public Boolean login(@RequestHeader HttpHeaders headers) {
+        return (userService.loginUser(headers.get("email").get(0), headers.get("password").get(0)));
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/user")
-    public UserDto getUserByEmailAndPassword(@RequestParam String password, @RequestParam String email) {
-        return User.mapToUserDto(userService.findUserByLoginData(email, password)); }
+    public UserDto getUserByEmailAndPassword(@RequestHeader HttpHeaders headers) {
+        return User.mapToUserDto(userService.findUserByLoginData(headers.get("email").get(0), headers.get("password").get(0))); }
 
     @RequestMapping(method = RequestMethod.GET, value = "/user/{uuid}")
     public UserDto getUserByUUID(@PathVariable String uuid) {

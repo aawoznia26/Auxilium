@@ -54,6 +54,7 @@ public class VipServiceTestSuite {
         List<Points> pointsList = new ArrayList<>();
         pointsList.add(points);
         user.setPoints(pointsList);
+        userRepository.save(user);
 
         //When
         vipService.assignPointsCoupons();
